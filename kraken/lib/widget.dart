@@ -41,7 +41,8 @@ class Kraken extends StatelessWidget {
   final KrakenNavigationDelegate navigationDelegate;
 
   // A method channel for receiving messaged from JavaScript code and sending message to JavaScript.
-  final KrakenJavaScriptChannel javaScriptChannel;
+  KrakenJavaScriptChannel _javaScriptChannel;
+  KrakenJavaScriptChannel get javaScriptChannel => _javaScriptChannel;
 
   final LoadErrorHandler onLoadError;
 
@@ -97,7 +98,6 @@ class Kraken extends StatelessWidget {
     this.bundleContent,
     this.onLoad,
     this.navigationDelegate,
-    this.javaScriptChannel,
     this.background,
     this.gestureClient,
     // Kraken's viewportWidth options only works fine when viewportWidth is equal to window.physicalSize.width / window.devicePixelRatio.
@@ -115,7 +115,9 @@ class Kraken extends StatelessWidget {
     this.animationController,
     this.debugEnableInspector,
     this.onJSError
-  }) : super(key: key);
+  }) : super(key: key) {
+    _javaScriptChannel = BridgeMethodManager.instance.createJavaScriptChannel();
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -160,6 +162,7 @@ class _KrakenRenderObjectWidget extends SingleChildRenderObjectWidget {
       debugEnableInspector: _krakenWidget.debugEnableInspector,
       gestureClient: _krakenWidget.gestureClient,
       navigationDelegate: _krakenWidget.navigationDelegate,
+      context: context,
     );
 
     if (kProfileMode) {

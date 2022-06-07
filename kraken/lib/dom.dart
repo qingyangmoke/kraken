@@ -28,4 +28,5 @@ export 'src/dom/elements/canvas/canvas.dart';
 export 'src/dom/elements/img.dart';
 export 'src/dom/elements/input.dart';
 export 'src/dom/elements/object.dart';
-
+export 'src/dom/elements/video.dart';
+export 'src/dom/elements/audio.dart';

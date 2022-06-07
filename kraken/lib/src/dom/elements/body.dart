@@ -13,7 +13,7 @@ import 'package:kraken/module.dart';
 const String BODY = 'BODY';
 
 class BodyElement extends Element {
-  BodyElement(double viewportWidth, double viewportHeight, int targetId, Pointer<NativeElement> nativePtr, ElementManager elementManager)
+  BodyElement(double viewportWidth, double viewportHeight, int targetId, Pointer<NativeElement> nativePtr, ElementManager elementManager, String hexColor)
       : super(
         targetId,
         nativePtr,
@@ -25,7 +25,7 @@ class BodyElement extends Element {
             HEIGHT: '${viewportHeight}px',
             OVERFLOW: AUTO,
             DISPLAY: BLOCK,
-            BACKGROUND_COLOR: 'white',
+            BACKGROUND_COLOR: hexColor,
           }
         ) {
     if (kProfileMode) {

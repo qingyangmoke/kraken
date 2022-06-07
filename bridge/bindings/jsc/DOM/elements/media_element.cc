@@ -17,7 +17,15 @@ JSMediaElement::~JSMediaElement() {
 JSMediaElement::JSMediaElement(JSContext *context) : JSElement(context) {}
 
 JSMediaElement::MediaElementInstance::MediaElementInstance(JSMediaElement *jsMediaElement, const char *tagName)
-  : ElementInstance(jsMediaElement, tagName, false), nativeMediaElement(new NativeMediaElement(nativeElement)) {}
+  : ElementInstance(jsMediaElement, tagName, false), nativeMediaElement(new NativeMediaElement(nativeElement)) {
+  std::string newTagName = std::string(tagName);
+  // std::string tagName = "video";
+  NativeString args_01{};
+  buildUICommandArgs(newTagName, args_01);
+
+  foundation::UICommandTaskMessageQueue::instance(context->getContextId())
+    ->registerCommand(eventTargetId, UICommand::createElement, args_01, nativeMediaElement);
+}
 
 JSMediaElement::MediaElementInstance::~MediaElementInstance() {
   if (_src != nullptr) JSStringRelease(_src);

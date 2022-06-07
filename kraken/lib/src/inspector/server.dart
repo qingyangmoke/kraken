@@ -4,6 +4,7 @@ import 'package:kraken/inspector.dart';
 import 'package:kraken/module.dart';
 import 'package:kraken/bridge.dart';
 import 'package:kraken/kraken.dart';
+import 'types.dart';
 import 'inspector.dart';
 
 const String CONTENT_TYPE = 'Content-Type';

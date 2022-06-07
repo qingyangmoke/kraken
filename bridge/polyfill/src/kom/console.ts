@@ -1,6 +1,6 @@
 // https://console.spec.whatwg.org/
 import { krakenPrint } from '../bridge';
-
+import { kraken } from "./kraken";
 const SEPARATOR = ' ';
 const INTERPOLATE = /%[sdifoO]/g;
 const DIMENSIONS = 3;
@@ -20,7 +20,8 @@ function printer(message: string, level?: string) {
     message = groupIndent + message;
   }
 
-  krakenPrint(message, level);
+  // krakenPrint(message, level);
+  kraken.invokeModule('Console', level || 'info', String(message));
 }
 
 /**

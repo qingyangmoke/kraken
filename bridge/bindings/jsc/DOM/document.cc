@@ -180,6 +180,12 @@ JSDocument::JSDocument(JSContext *context) : JSNode(context, "Document") {
     JSElement::defineElement("object", [](JSContext *context) -> ElementInstance* {
       return new JSObjectElement::ObjectElementInstance(JSObjectElement::instance(context));
     });
+    JSElement::defineElement("video", [](JSContext *context) -> ElementInstance* {
+      return new JSMediaElement::MediaElementInstance(JSMediaElement::instance(context), "video");
+    });
+    JSElement::defineElement("audio", [](JSContext *context) -> ElementInstance* {
+      return new JSMediaElement::MediaElementInstance(JSMediaElement::instance(context), "audio");
+    });
   }
 }
 

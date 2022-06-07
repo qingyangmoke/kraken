@@ -14,12 +14,14 @@ import 'package:flutter/rendering.dart';
 
 import 'package:kraken/bridge.dart';
 import 'package:kraken/dom.dart';
+import 'package:kraken/kraken.dart';
 import 'package:kraken/module.dart';
 import 'package:kraken/rendering.dart';
 import 'package:kraken/inspector.dart';
 import 'package:kraken/gesture.dart';
 import 'package:kraken/src/module/module_manager.dart';
 import 'bundle.dart';
+import 'package:kraken/router.dart';
 
 // Error handler when load bundle failed.
 typedef LoadHandler = void Function(KrakenController controller);
@@ -127,6 +129,7 @@ class KrakenViewController {
       viewport: viewport,
       showPerformanceOverlayOverride: showPerformanceOverlay,
       controller: rootController,
+      background: background ?? Color(0xffffffff),
     );
 
     if (kProfileMode) {
@@ -356,8 +359,15 @@ class KrakenViewController {
       if (policy == KrakenNavigationActionPolicy.cancel) return;
 
       switch (action.navigationType) {
-        case KrakenNavigationType.reload:
-          rootController.reloadUrl(action.target);
+        case KrakenNavigationType.navigate: // window.open 打开用的是这种方式
+          KrakenPageRouter.openUrl(rootController.context, action.target);
+          break;
+        case KrakenNavigationType.reload: // location.href 或者 a标签
+          if(contextId == 0) {
+            KrakenPageRouter.openUrl(rootController.context, action.target);
+          } else {
+            rootController.reloadUrl(action.target);
+          }
           break;
         default:
         // Navigate and other type, do nothing.
@@ -451,6 +461,8 @@ class KrakenController {
   bool debugEnableInspector;
   GestureClient _gestureClient;
 
+  final dynamic context; // BuildContext
+
   KrakenController(
     String name,
     double viewportWidth,
@@ -468,6 +480,7 @@ class KrakenController {
     this.onLoadError,
     this.onJSError,
     this.debugEnableInspector,
+    this.context,
   })  : _name = name,
         _bundleURL = bundleURL,
         _bundlePath = bundlePath,
@@ -590,6 +603,7 @@ class KrakenController {
   }
 
   void dispose() {
+    print('dispose contextId=${_view.contextId}');
     _view.dispose();
     _module.dispose();
     _controllerMap[_view.contextId] = null;
@@ -645,6 +659,11 @@ class KrakenController {
       url = await (methodChannel as KrakenNativeChannel).getUrl();
     }
 
+    // TODO: polyfill 放入
+    KrakenBundle coreBundle = await KrakenBundle.getBundle('assets/core.js');
+    // 注入数据
+    coreBundle.content = 'window.__contextId__ = "${view.contextId}"; ${coreBundle.content}';
+    await coreBundle.eval(view.contextId);
     if (onLoadError != null) {
       try {
         _bundle = await KrakenBundle.getBundle(url, contentOverride: _bundleContent);

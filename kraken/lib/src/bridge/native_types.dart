@@ -396,3 +396,16 @@ class NativePerformanceEntryList extends Struct {
   @Int32()
   int length;
 }
+
+
+typedef Native_PlayMedia = Void Function(Pointer<NativeMediaElement> nativeMediaElement);
+typedef Native_PauseMedia = Void Function(Pointer<NativeMediaElement> nativeMediaElement);
+typedef Native_FastSeek = Void Function(Pointer<NativeMediaElement> nativeMediaElement, Double duration);
+
+class NativeMediaElement extends Struct {
+  Pointer<NativeElement> nativeElement;
+
+  Pointer<NativeFunction<Native_PlayMedia>> play;
+  Pointer<NativeFunction<Native_PauseMedia>> pause;
+  Pointer<NativeFunction<Native_FastSeek>> fastSeek;
+}

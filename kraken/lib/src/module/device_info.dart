@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:kraken/src/module/module_manager.dart';
+import 'package:flutter/material.dart';
 
 DeviceInfoPlugin _deviceInfoPlugin;
 
@@ -57,8 +58,7 @@ class DeviceInfoModule extends BaseModule {
   DeviceInfoModule(ModuleManager moduleManager) : super(moduleManager);
 
   @override
-  void dispose() {
-  }
+  void dispose() {}
 
   @override
   String invoke(String method, dynamic params, InvokeModuleCallback callback) {
@@ -68,8 +68,40 @@ class DeviceInfoModule extends BaseModule {
       });
     } else if (method == 'getHardwareConcurrency') {
       return getHardwareConcurrency().toString();
+    } else if (method == 'getDisplayInfo') {
+      final json =  getDisplayInfo();
+      callback(data: json);
     }
     return '';
+  }
+
+  Map getDisplayInfo() {
+    final MediaQueryData queryData =
+        MediaQuery.of(moduleManager.controller.context);
+    final result = {
+      "orientation": queryData.orientation == Orientation.landscape
+          ? 'landscape'
+          : 'portrait',
+      "platformBrightness":
+          (queryData.platformBrightness == Brightness.dark) ? 'dark' : 'light',
+      "devicePixelRatio": queryData.devicePixelRatio,
+      "appBar": {
+        "visible": false,
+        'width': queryData.size.width,
+        'height': queryData.size.height,
+      },
+      "viewport": {
+        'width': queryData.size.width,
+        'height': queryData.size.height,
+      },
+      "safeArea": {
+        'top': queryData.padding.top,
+        'left': queryData.padding.left,
+        'right': queryData.padding.right,
+        'bottom': queryData.padding.bottom,
+      },
+    };
+    return result;
   }
 }
 
@@ -92,7 +124,8 @@ Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
   return <String, dynamic>{
     'id': id, // For example: iPhone12,1
     'brand': 'Apple',
-    'model': data.model, // For example: iPhone or iPod, not the detail model name like 'iPhone 8'
+    'model': data
+        .model, // For example: iPhone or iPod, not the detail model name like 'iPhone 8'
     // The value of this property is an arbitrary alphanumeric string
     // that is associated with the device as an identifier.
     // For example, you can find the name of an iOS device in the General > About settings.

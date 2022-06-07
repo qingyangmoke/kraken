@@ -35,6 +35,8 @@ class ModuleManager {
       defineModule((moduleManager) => MethodChannelModule(moduleManager));
       defineModule((moduleManager) => NavigationModule(moduleManager));
       defineModule((moduleManager) => NavigatorModule(moduleManager));
+      defineModule((moduleManager) => ConsoleModule(moduleManager));
+      defineModule((moduleManager) => ResourcesModule(moduleManager));
       inited = true;
     }
   }

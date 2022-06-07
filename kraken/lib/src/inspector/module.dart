@@ -1,5 +1,7 @@
 import 'package:kraken/inspector.dart';
+import 'types.dart';
 
+export 'types.dart';
 export 'modules/dom.dart';
 export 'modules/css.dart';
 export 'modules/page.dart';

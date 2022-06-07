@@ -167,7 +167,7 @@ class AssetsBundle extends KrakenBundle with BundleMixin {
   Future<void> resolve() async {
     // JSBundle get default bundle manifest.
     manifest = AppManifest();
-    String localPath = url.toString();
+    String localPath = url.path.toString();
     ByteData data = await rootBundle.load(localPath);
     content = await _resolveStringFromData(data, localPath);
     isResolved = true;

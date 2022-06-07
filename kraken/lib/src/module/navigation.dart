@@ -1,3 +1,5 @@
+import 'package:kraken/router.dart';
+
 import 'module_manager.dart';
 
 typedef KrakenNavigationDecisionHandler = Future<KrakenNavigationActionPolicy> Function(KrakenNavigationAction action);
@@ -38,22 +40,27 @@ class NavigationModule extends BaseModule {
 
   @override
   String invoke(String method, dynamic params, callback) {
-    if (method == 'goTo') {
-      String url = params[0];
-      String sourceUrl = moduleManager.controller.bundleURL;
+    switch(method) {
+      case 'goTo':
+        // String url = params[0];
+        String url = params is String ? params : params[0];
+        String sourceUrl = moduleManager.controller.bundleURL ?? '';
+        print('Navigation.goTo url=' + url + ",sourceUrl=" + sourceUrl);
+        Uri targetUri = Uri.parse(url);
+        Uri sourceUri = Uri.parse(sourceUrl);
 
-      Uri targetUri = Uri.parse(url);
-      Uri sourceUri = Uri.parse(sourceUrl);
-
-      if (targetUri.scheme != sourceUri.scheme ||
-          targetUri.host != sourceUri.host ||
-          targetUri.port != sourceUri.port ||
-          targetUri.path != sourceUri.path ||
-          targetUri.query != sourceUri.query) {
-        moduleManager.controller.view.handleNavigationAction(sourceUrl, url, KrakenNavigationType.reload);
-      }
+        if (targetUri.scheme != sourceUri.scheme ||
+            targetUri.host != sourceUri.host ||
+            targetUri.port != sourceUri.port ||
+            targetUri.path != sourceUri.path ||
+            targetUri.query != sourceUri.query) {
+          moduleManager.controller.view.handleNavigationAction(sourceUrl, url, KrakenNavigationType.reload);
+        }
+        break;
+      case 'back':
+        KrakenPageRouter.pop(moduleManager.controller.context);
+        break;
     }
-
     return '';
   }
 }

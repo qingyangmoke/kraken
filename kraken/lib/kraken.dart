@@ -8,3 +8,4 @@ library kraken;
 export 'widget.dart';
 export 'launcher.dart';
 export 'module.dart';
+export 'bridge/manager.dart';

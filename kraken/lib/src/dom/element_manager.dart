@@ -86,14 +86,15 @@ class ElementManager implements WidgetsBindingObserver, ElementsBindingObserver 
 
   final List<VoidCallback> _detachCallbacks = [];
 
-  ElementManager({this.contextId, this.viewport, this.controller, this.showPerformanceOverlayOverride}) {
+  Color background;
+  ElementManager({this.contextId, this.viewport, this.controller, this.showPerformanceOverlayOverride, this.background}) {
 
     if (kProfileMode) {
       PerformanceTiming.instance(contextId).mark(PERF_ELEMENT_MANAGER_PROPERTY_INIT);
       PerformanceTiming.instance(contextId).mark(PERF_BODY_ELEMENT_INIT_START);
     }
 
-    _rootElement = BodyElement(viewportWidth, viewportHeight, BODY_ID, bodyNativePtrMap[contextId], this)
+    _rootElement = BodyElement(viewportWidth, viewportHeight, BODY_ID, bodyNativePtrMap[contextId], this, '#${background.value.toRadixString(16)}')
       ..attachBody();
 
     if (kProfileMode) {
@@ -183,6 +184,10 @@ class ElementManager implements WidgetsBindingObserver, ElementsBindingObserver 
       defineElement(IMAGE, (id, nativePtr, elementManager) => ImageElement(id, nativePtr.cast<NativeImgElement>(), elementManager));
       defineElement(CANVAS, (id, nativePtr, elementManager) => CanvasElement(id, nativePtr.cast<NativeCanvasElement>(), elementManager));
       defineElement(OBJECT, (id, nativePtr, elementManager) => ObjectElement(id, nativePtr.cast<NativeObjectElement>(), elementManager));
+      // 视频
+      defineElement(VIDEO, (id, nativePtr, elementManager) => VideoElement(id, nativePtr.cast<NativeMediaElement>(), elementManager));
+      // 音频
+      defineElement(AUDIO, (id, nativePtr, elementManager) => AudioElement(id, nativePtr.cast<NativeMediaElement>(), elementManager));
       inited = true;
     }
   }

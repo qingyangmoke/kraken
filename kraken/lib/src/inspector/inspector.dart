@@ -26,6 +26,8 @@ class Inspector {
   ElementManager elementManager;
   final Map<String, InspectModule> moduleRegistrar = {};
   InspectServer server;
+  // temp cache log entries
+  final List<InspectorLogEntry> logEntries = [];
 
   factory Inspector(ElementManager elementManager, { int port = INSPECTOR_DEFAULT_PORT, String address }) {
     if (Inspector.prevInspector != null) {
@@ -48,6 +50,7 @@ class Inspector {
     registerModule(InspectPageModule(this));
     registerModule(InspectCSSModule(this));
     registerModule(InspectRuntimeModule(this));
+    registerModule(InspectLogModule(this));
 
     // Listen with broadcast address (0.0.0.0), not to restrict incoming ip address.
     server = InspectServer(this, address: '0.0.0.0', port: port)
@@ -78,9 +81,27 @@ class Inspector {
     List<String> moduleMethod = _method.split('.');
     String module = moduleMethod[0];
     String method = moduleMethod[1];
-
     if (moduleRegistrar.containsKey(module)) {
       moduleRegistrar[module].invoke(id, method, params);
+    }
+    print('$_method $params');
+    // flush temp cache log entries
+    flushLogEntries();
+  }
+
+  void flushLogEntries() {
+    if (server.connected) {
+      logEntries.forEach(onLogEntryAdded);
+      logEntries.clear();
+    }
+  }
+
+  void onLogEntryAdded(InspectorLogEntry entry) {
+    if (server.connected) {
+      server.sendEventToFrontend(
+          InspectorEvent('Log.entryAdded', JSONEncodableMap({'entry': entry})));
+    } else {
+      logEntries.add(entry);
     }
   }
 
@@ -111,29 +132,4 @@ class Inspector {
 
     return result;
   }
-}
-
-abstract class JSONEncodable {
-  Map toJson();
-}
-
-@immutable
-class InspectorEvent implements JSONEncodable {
-  final String method;
-  final JSONEncodable params;
-  InspectorEvent(this.method, this.params) : assert(method != null);
-
-  Map toJson() {
-    return {
-      'method': method,
-      'params': params?.toJson() ?? {},
-    };
-  }
-}
-
-class JSONEncodableMap extends JSONEncodable {
-  Map map;
-  JSONEncodableMap(this.map);
-
-  Map toJson() => map;
 }
